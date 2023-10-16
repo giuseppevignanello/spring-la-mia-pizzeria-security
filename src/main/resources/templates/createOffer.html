@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Pizzeria</title>
+	<link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}" />
+</head>
+
+<body>
+	<form 
+		th:object="${specialOffer}"
+		method="POST"	
+	>
+	<div>
+	<label for="title">Offer title</label>
+	<input type="text" name="title" th:field="*{title}" required maxlength="30" />
+	
+	
+	<label for="startDate">Start Date</label>
+	<input type="date" name="startDate" th:field="*{startDate}" id="startDate" required />
+	
+	<label for="endDate">End Date</label>
+	<input  type="date" name="endDate" th:field="*{endDate}" id="endDate" required />
+	
+	<button type="submit" value="CREATE"> Invia </button> 
+	</div>
+	</form>
+</body>
+
+</html>
