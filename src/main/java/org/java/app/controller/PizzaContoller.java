@@ -3,6 +3,7 @@ package org.java.app.controller;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.internal.build.AllowSysOut;
 import org.java.app.pojo.Ingredient;
@@ -46,9 +47,9 @@ public class PizzaContoller {
 	@GetMapping("/{id}")
 	public String show(Model model, @PathVariable int id) {
 		
-		Pizza pizza = pizzaService.findById(id);
-		 List<SpecialOffer> specialOffers = pizza.getSpecialOffers(); 
-		 List<Ingredient> ingredients = pizza.getIngredients();
+		Optional<Pizza> pizza = pizzaService.findById(id);
+		 List<SpecialOffer> specialOffers = pizza.get().getSpecialOffers(); 
+		 List<Ingredient> ingredients = pizza.get().getIngredients();
 		model.addAttribute("pizza", pizza);	
 		 model.addAttribute("specialOffers", specialOffers);
 		 model.addAttribute("ingredients", ingredients);
@@ -136,8 +137,8 @@ public class PizzaContoller {
 		List<Pizza> pizzas = pizzaService.findAll();
 		model.addAttribute("pizzas", pizzas);
 		
-		Pizza pizzaToDelete = pizzaService.findById(id); 
-		pizzaService.deletePizza(pizzaToDelete);
+		Optional<Pizza> pizzaToDelete = pizzaService.findById(id); 
+		pizzaService.deletePizza(pizzaToDelete.get());
 		return "redirect:/";
 	}
 	
@@ -146,7 +147,7 @@ public class PizzaContoller {
 			@PathVariable("pizza_id") int id, Model model
 			) {
 		
-		Pizza pizza = pizzaService.findById(id);
+		Optional<Pizza> pizza = pizzaService.findById(id);
 		SpecialOffer specialOffer = new SpecialOffer();
 		model.addAttribute("pizza", pizza); 
 		model.addAttribute("specialOffer", specialOffer);
@@ -161,8 +162,8 @@ public class PizzaContoller {
 			Model model
 	) {
 		
-		Pizza pizza = pizzaService.findById(id); 
-		specialOffer.setPizza(pizza); 
+		Optional<Pizza> pizza = pizzaService.findById(id); 
+		specialOffer.setPizza(pizza.get()); 
 		
 		offerService.save(specialOffer);
 		

@@ -1,5 +1,9 @@
 package org.java.app;
 
+import org.java.app.auth.pojo.Role;
+import org.java.app.auth.pojo.User;
+import org.java.app.auth.service.RoleService;
+import org.java.app.auth.service.UserService;
 import org.java.app.pojo.Ingredient;
 import org.java.app.pojo.Pizza;
 import org.java.app.serv.IngredientService;
@@ -8,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication
 public class SpringLaMiaPizzeriaCrudApplication implements CommandLineRunner {
@@ -20,8 +25,11 @@ public class SpringLaMiaPizzeriaCrudApplication implements CommandLineRunner {
 	public static void main(String[] args) {
 		SpringApplication.run(SpringLaMiaPizzeriaCrudApplication.class, args);
 	}
-	
+	@Autowired
+	private RoleService roleService;
 
+	@Autowired
+	private UserService userService;
 	 
 	@Override
 	public void run(String... args) throws Exception {
@@ -52,6 +60,24 @@ public class SpringLaMiaPizzeriaCrudApplication implements CommandLineRunner {
 		pizzaService.save(marinara);
 		pizzaService.save(diavola);
 		
-	}
+		Role admin = new Role("ADMIN");
+		Role user = new Role("USER");
 
+		roleService.save(admin);
+		roleService.save(user);
+
+		final String pwsAdmin = new BCryptPasswordEncoder().encode("password");
+		final String pwsUser = new BCryptPasswordEncoder().encode("password");
+
+		User admin2 = new User("admin", pwsAdmin, admin, user);
+		User user2 = new User("user", pwsUser, user);
+
+		userService.save(admin2);
+		userService.save(user2);
+
+	}
+	
+	
 }
+	
+		
