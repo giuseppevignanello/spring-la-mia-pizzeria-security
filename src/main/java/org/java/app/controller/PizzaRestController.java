@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.java.app.controller.dto.PizzaDTO;
 import org.java.app.pojo.Pizza;
+import org.java.app.repo.PizzaRepo;
 import org.java.app.serv.PizzaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,89 +21,90 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin 
+@CrossOrigin
 @RequestMapping("/api/v1.0")
 public class PizzaRestController {
 
-	@Autowired 
-	private PizzaService pizzaService; 
+	@Autowired
+	private PizzaService pizzaService;
 	
-	@GetMapping 
+	@Autowired
+	private PizzaRepo pizzaRepo;
+
+	@GetMapping
 	public ResponseEntity<List<Pizza>> getAll() {
-		
+
 		List<Pizza> pizzas = pizzaService.findAll();
 		return new ResponseEntity<>(pizzas, HttpStatus.OK);
-		
+
 	}
-	@PostMapping 
-	public ResponseEntity<Integer> save(
-		@RequestBody PizzaDTO pizzaDTO
-	) {
-		Pizza pizza = new Pizza(pizzaDTO); 
-		
+
+	@PostMapping
+	public ResponseEntity<Integer> save(@RequestBody PizzaDTO pizzaDTO) {
+		Pizza pizza = new Pizza(pizzaDTO);
+
 		pizza = pizzaService.save(pizza);
 		return new ResponseEntity<>(pizza.getId(), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("{id}")
-	public ResponseEntity<Pizza> getPizza(
-		@PathVariable int id
-	) {
+	public ResponseEntity<Pizza> getPizza(@PathVariable int id) {
 		Optional<Pizza> optPizza = pizzaService.findById(id);
-		
+
 		if (optPizza.isEmpty()) {
-			
+
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		}
-		
+
 		return new ResponseEntity<>(optPizza.get(), HttpStatus.OK);
 	}
-	
+
+	@GetMapping("/filter/{filter}")
+	public ResponseEntity<List<Pizza>> getFilteredPizzas(@PathVariable String filter) {
+		List<Pizza> filteredPizzas = pizzaRepo.findByNameContaining(filter);
+
+		return new ResponseEntity<List<Pizza>>(filteredPizzas, HttpStatus.OK);
+	}
+
 	@PutMapping("{id}")
-	public ResponseEntity<Pizza> updatePizza(
-			@PathVariable int id,
-			@RequestBody PizzaDTO pizzaDTO
-		) {
-		
+	public ResponseEntity<Pizza> updatePizza(@PathVariable int id, @RequestBody PizzaDTO pizzaDTO) {
+
 		Optional<Pizza> optPizza = pizzaService.findById(id);
-		
+
 		if (optPizza.isEmpty()) {
-			
+
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		}
-		
-		Pizza pizza= optPizza.get();
-		
+
+		Pizza pizza = optPizza.get();
+
 		pizza.fillFromPizzaDto(pizzaDTO);
-	
+
 		try {
-			
+
 			pizza = pizzaService.save(pizza);
-			
+
 			return new ResponseEntity<>(pizza, HttpStatus.OK);
 		} catch (Exception e) {
-			
+
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@DeleteMapping("{id}")
-	public ResponseEntity<Boolean> deletePizza(
-			@PathVariable int id
-		) {
-		
+	public ResponseEntity<Boolean> deletePizza(@PathVariable int id) {
+
 		Optional<Pizza> optPizza = pizzaService.findById(id);
-		
+
 		if (optPizza.isEmpty()) {
-			
+
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		}
-		
+
 		Pizza pizza = optPizza.get();
 		pizzaService.deletePizza(pizza);
-		
+
 		return new ResponseEntity<>(true, HttpStatus.OK);
-	}		
-	
-	
+	}
+
 }
